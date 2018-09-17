@@ -1,0 +1,25 @@
+.layui-mylogo{
+    height:60px;
+    width:100px;
+}
+.myanim{
+    width:100px;
+    height:100px;
+    border-radius: 50%;
+    background: #006600;
+    position:absolute;
+    left:50%;
+    top:50%;
+    margin:-50px 0 0 -50px;
+    text-align: center;
+    line-height: 100px;
+    color:white;
+
+}
+.picLoading{
+    display: none !important
+}
+#demo1{
+    width:100px;
+    height:100px;
+}

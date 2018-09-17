@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../../../layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../layuiadmin/style/admin.css" media="all">
+    <title>layer数据传递</title>
+</head>
+<body>
+    <table class="layui-table" lay-filter="demo"  id="demo">
+        <!-- <thead>
+            <tr>
+                <th>编号</th>
+                <th>姓名</th>
+                <th>出生日期</th>
+                <th>操作</th>
+            </tr> 
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>黄XX</td>
+                <td>1999-09-09</td>
+                <td>
+                    <span class="layui-bg-red">删除</span>
+                    <span class="layui-bg-blue">修改</span>
+                </td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Mary</td>
+                <td>1999-09-08</td>
+                <td>
+                     
+                </td>
+            </tr>
+        </tbody>  -->
+    </table>
+    <div class="layui-card">
+        接收子页面传来的值：<input id="msg" />
+    </div>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-primary layui-btn-mini" lay-event="detail">查看</a>
+        <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+    </script>
+    <script src="../../../layuiadmin/layui/layui.js"></script>
+    <script>
+        var showData = null;
+        var tableData = JSON.parse(window.localStorage.getItem("tableData"))
+        console.log(tableData)
+        showData =  tableData;
+        var data;
+        layui.use(['layer','table','jquery'],function(){             
+            var layer = layui.layer,
+            table = layui.table
+            $ = layui.jquery;
+
+            // $.ajax({
+            //     type:'get',
+            //     url:'http://127.0.0.1/ace/ajax/loadUser.php',
+            //     success:function(data){
+            //         showData = data
+            //     }
+            // })
+            // console.log(showData);
+            // layer.open({
+            //     type:2,
+            //     content:"./formData.html"
+            // })
+            //监听工具条
+            table.on('tool(demo)', function(obj){
+                data = obj.data; //获取到当前行的值 赋值给全局变量  让子页面可以直接拿取这个数据
+
+                if(obj.event === 'detail'){
+                layer.msg('ID：'+ data.uid + ' 的查看操作');
+                } else if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    obj.del();
+                    layer.close(index);
+                });
+                } else if(obj.event === 'edit'){
+                    //layer.alert('编辑行：<br>'+ JSON.stringify(data))
+                    layer.open({
+                        type:2,
+                        area: ['800px', '494px'],//这是弹出层的大小
+                        content:'./formData.html'
+                    })
+                }
+            });
+            
+            table.render({
+                elem:'#demo',
+                data:showData?showData.data:'',
+                url:showData?'':"http://127.0.0.1/ace/ajax/loadUser.php",
+                cols:  [[ //标题栏
+                    {checkbox: true, fixed: true}
+                    ,{field:'uid', title: 'ID', width:80, sort: true, fixed: true}
+                    ,{field:'uname', title: '商户', width:80, sort: true}
+                    ,{field:'upwd', title: '密码', width:80, edit:true}
+                    ,{field:'email', title: '邮件', width:180}
+                    ,{field:'phone', title: '电话', width:100}
+                    ,{field:'right', title: '操作',width:280,toolbar:"#barDemo"}
+                ]],
+                page: true,
+                
+                parseData: function(res){ //res 即为原始返回的数据
+                    showData = res.data;
+                    res=JSON.stringify(res)
+                    console.log('showData1:'+res)
+                    window.localStorage.setItem('tableData',res);//将数据保存在本地浏览器中
+                },
+                success: function(layero, index){
+                    var body = layer.getChildFrame('body',index);//建立父子联系
+                    var iframeWin = window[layero.find('iframe')[0]['name']];
+                    console.log(arr); //得到iframe页的body内容
+                    // console.log(body.find('input'));
+                }
+            })
+            
+        })
+        console.log('showData2:'+showData)
+        
+    </script>
+</body>
+</html>

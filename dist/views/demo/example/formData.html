@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../../../layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../layuiadmin/style/admin.css" media="all">
+    <link rel="stylesheet" href=".../../../../../layuiadmin/style/formSelects-v4.css"  media="all">
+    <title>Document</title>
+    <form action="#" class="layui-form layui-container" lay-filter="formTest">
+        <div class="layui-form-item">
+            <label class="layui-form-label">编号</label>
+            <div class="layui-input-block">
+                <input type="number" class="layui-input" name="uid" id="uid" lay-verify="pass">
+            </div>
+        </div>
+        <div class="layui-form-item">
+                <label class="layui-form-label">姓名</label>
+                <div class="layui-input-block">
+                    <input type="text" class="layui-input" name="uname" id="uname" lay-verify="uname">
+                </div>
+        </div>
+        <div class="layui-form-item">
+                <label class="layui-form-label">邮箱</label>
+                <div class="layui-input-block">
+                    <input type="text" class="layui-input" name="email" id="email" lay-verify="email">
+                </div>
+        </div>
+        <div class="layui-form-item">
+                <label class="layui-form-label">自定义</label>
+                <div class="layui-input-block">
+                    <input type="text" class="layui-input" name="randomText" id="randomText">
+                    <button class="layui-btn" id="goFather">向父级传值</button>
+                </div>
+        </div>
+
+        <div class="layui-form-item" >
+            <label class="layui-form-label">地址</label>
+            <div class="layui-input-block">
+                    <select   name="city" lay-filter="city" xm-select="select1" xm-select-search="">
+                        <!-- <option value=""></option>
+                        <option value="0" selected="selected">北京</option>
+                        <option value="1">上海</option>
+                        <option value="2">广州</option>
+                        <option value="3">深圳</option>
+                        <option value="4">杭州</option> -->
+                    </select>
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+                <div class="layui-input-block">
+                  <button class="layui-btn" lay-submit lay-filter="formDemo">修改</button>
+                </div>
+        </div>
+    </form>
+</head>
+<body>
+    <script src="../../../layuiadmin/layui/layui.js"></script>
+    <script>
+    //var index = parent.layer.getFrameIndex(window.name);//获取子窗口索引
+    //console.log(index)
+    //全局定义一次, 加载formSelects
+    layui.config({
+        base: '../../../layuiadmin/lib/extend/' //此处路径请自行处理, 可以使用绝对路径
+    }).extend({
+        formSelects: 'formSelects-v4'
+    });
+    layui.use(['form','jquery',"formSelects"], function(){
+        var form = layui.form
+        $ = layui.jquery
+        formSelects = layui.formSelects;
+        console.log(parent.data) //获取父元素上的对象值
+        // $("#uid").val(parent.data.uid) //将父级上的data属性值赋值给指定元素
+        // $("#uname").val(parent.data.uname)
+        // $("#email").val(parent.data.email)
+
+        $('#goFather').click(function(){
+            var value = $('#randomText').val();
+            console.log(value)
+            parent.$('#msg').val(value); //给父元素上的id名为msg的标签赋值当前值
+            parent.layer.closeAll(); //关闭当前的弹出层
+        })
+       //local模式
+        // formSelects.data('select1', 'local', {
+        //     arr: [
+        //         {"name": "分组-1", "type": "optgroup"},
+        //         {"name": "北京", "value": 1},
+        //         {"name": "上海", "value": 2},
+        //         {"name": "分组-2", "type": "optgroup"},
+        //         {"name": "广州", "value": 3},
+        //         {"name": "深圳", "value": 4},
+        //         {"name": "天津", "value": 5}
+        //     ]
+        // });
+        //local, 注意 value值请保证唯一
+        formSelects.data('select1', 'local', {
+            arr: [
+                {
+                    "name": "北京", 
+                    "value": 1, 
+                    "children": [
+                        {"name": "北京市1", "value": 12, "children": [
+                            {"name": "朝阳区1", "value": 13, "children": []},
+                            {"name": "朝阳区2", "value": 14, "children": []},
+                            {"name": "朝阳区3", "value": 15, "children": []},
+                            {"name": "朝阳区4", "value": 16, "children": []},
+                        ]},
+                        {"name": "北京市2", "value": 17, "children": [
+                            {"name": "四合院1", "value": 13, "children": []},
+                            {"name": "四合院2", "value": 14, "children": []},
+                        ]},
+                        {"name": "北京市3", "value": 18, "children": []},
+                        {"name": "北京市4", "value": 19, "children": []},
+                    ]
+                },
+                {
+                    "name": "天津", 
+                    "value": 2, 
+                    "children": [
+                        {"name": "天津市1", "value": 51, "children": []},
+                    ]
+                },
+            ],
+            linkage: true,   //开启联动模式
+            
+        });
+        form.val("formTest", { //给标识为formText的表单设置默认值
+            "uid": parent.data.uid  // "name": "value"
+            ,"uname":parent.data.uname
+            ,"email":parent.data.email
+            ,"randomText":"向父类传的默认值123"
+        })
+        form.verify({ //设置自定义表单的验证
+            uname:function(value,item){  //uname为lay-filter上的
+                if(/(^\_)|(\__)|(\_+$)/.test(value)){
+                return '用户名首尾不能出现下划线\'_\'';
+        
+                }
+            }
+            ,pass:[
+                /^[\S]{1,6}$/ 
+                ,'编号必须1到6位'
+            ] 
+        })
+        form.on('submit(formDemo)',function(data){
+            console.log(formSelects.value('select1')) //获取当前select中的值
+            console.log(data.elem) //被执行事件的元素DOM对象，一般为button对象
+            console.log(data.form) //被执行提交的form对象，一般在存在form标签时才会返回
+            console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+            return false
+        })
+        //点击修改按钮后执行下列代码
+        //parent.location.reload(); // 父页面刷新
+    });
+    </script>
+</body>
+</html>
